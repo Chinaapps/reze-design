@@ -11,6 +11,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      BETTER_AUTH_SECRET: build-dummy-secret
+      BETTER_AUTH_URL: http://localhost:3000
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,10 +30,19 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Inspect build output
+        run: |
+          echo "PWD=$(pwd)"
+          ls -la
+          echo "--- look for BUILD_ID ---"
+          find . -maxdepth 4 -name BUILD_ID
+          echo "--- .next listing ---"
+          ls -la .next || echo "no .next dir"
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: reze-design-next-build
-          path: |
-            .next
+          path: .next/
+          include-hidden-files: true
           retention-days: 7
